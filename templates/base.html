@@ -1,19 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
-          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
-          crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="/static/css/style.css"/>
-    <title>Маркетплейс</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Название вашего маркетплейса</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Иконки Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Ваши кастомные стили -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-light bg-light">
+    <!-- Навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Маркетплейс</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Каталог</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            Категории
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Электроника</a></li>
+                            <li><a class="dropdown-item" href="#">Одежда</a></li>
+                            <li><a class="dropdown-item" href="#">Для дома</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Все категории</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">О нас</a>
+                    </li>
+                </ul>
+
+                <!-- Поиск и действия пользователя -->
+                <div class="d-flex align-items-center">
+                    <form class="d-flex me-3">
+                        <div class="input-group">
+                            <input class="form-control" type="search" placeholder="Поиск товаров...">
+                            <button class="btn btn-outline-light" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-outline-light position-relative">
+                            <i class="bi bi-cart"></i> Корзина
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3
+                            </span>
+                        </a>
+                        <a href="#" class="btn btn-outline-light">
+                            <i class="bi bi-person"></i> Войти
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
-</header>
+
+    <!-- Герой-секция -->
+<!--    <header class="bg-dark text-white py-5">-->
+<!--        <div class="container">-->
+<!--            <div class="row align-items-center">-->
+<!--                <div class="col-lg-6">-->
+<!--                    <h1 class="display-4 fw-bold mb-3">Лучшие товары по выгодным ценам</h1>-->
+<!--                    <p class="lead mb-4">Тысячи товаров от проверенных продавцов с быстрой доставкой по всей стране</p>-->
+<!--                    <a href="#" class="btn btn-primary btn-lg px-4 me-2">В каталог</a>-->
+<!--                    <a href="#" class="btn btn-outline-light btn-lg px-4">Стать продавцом</a>-->
+<!--                </div>-->
+<!--                <div class="col-lg-6">-->
+<!--                    <img src="https://via.placeholder.com/600x400" alt="Главное изображение" class="img-fluid rounded">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </header>-->
+<main role="main" class="container">
+    {% block main %}{% endblock %}
+</main>
+
+
+    <!-- Футер -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    <h5 class="mb-3">Маркетплейс</h5>
+                    <p>Лучший выбор товаров по выгодным ценам с быстрой доставкой по всей стране.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="bi bi-telegram fs-5"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-vkontakte fs-5"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-twitter fs-5"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-youtube fs-5"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Покупателям</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Как сделать заказ</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Способы оплаты</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Доставка</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Возврат товара</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Вопросы и ответы</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Продавцам</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Как продавать</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Правила площадки</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Личный кабинет</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Документация API</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="mb-3">Контакты</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-geo-alt me-2"></i> г. Москва, ул. Примерная, 123</li>
+                        <li class="mb-2"><i class="bi bi-telephone me-2"></i> +7 (123) 456-78-90</li>
+                        <li class="mb-2"><i class="bi bi-envelope me-2"></i> info@marketplace.ru</li>
+                        <li><i class="bi bi-clock me-2"></i> Пн-Пт: 9:00 - 18:00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="small mb-0">© 2023 Маркетплейс. Все права защищены.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-white small text-decoration-none me-3">Политика конфиденциальности</a>
+                    <a href="#" class="text-white small text-decoration-none">Пользовательское соглашение</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Ваши кастомные скрипты -->
+    <script src="js/script.js"></script>
 </body>
 </html>
