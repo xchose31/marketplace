@@ -61,6 +61,11 @@ def Login_user():
 
     return render_template('login_user.html', form=form)
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect('/')
+
 
 def main():
     db_session.global_init('db/market.db')
