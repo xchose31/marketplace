@@ -17,6 +17,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     phone_number = Column(String)
     email = Column(String, unique=True)
     date_of_creation = Column(String, default=datetime.date.today())
+    hashed_password = Column(String)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
