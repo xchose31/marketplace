@@ -85,7 +85,7 @@ def create_shop():
             return render_template('shop_registration.html', form=form, message="Магазин с таким названием существует")
         f = form.logo.data
         filename = secure_filename(f.filename)
-        f.save(os.path.join(app.instance_path, 'photos', filename))
+        f.save(os.path.join('static', 'photo', filename))
         shop = Shop(
             name=form.name.data,
             owner_id=current_user.id,
@@ -98,6 +98,14 @@ def create_shop():
         return redirect('/')
 
     return render_template('shop_registration.html', form=form)
+
+
+@login_required
+@app.route('/my_shops')
+def my_shops():
+    db_sess = db_session.create_session()
+    shops = db_sess.query(Shop).filter(Shop.owner_id == current_user.id).all()
+    return render_template('my_shops.html', shops=shops)
 
 
 def main():
