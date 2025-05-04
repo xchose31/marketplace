@@ -134,7 +134,7 @@ def edit_shop(shop_id):
             abort(404)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+        shop = db_sess.query(Shop).filter(Shop.id == shop_id, Shop.user == current_user).first()
         if shop:
             shop.name = form.name.data
             shop.description = form.description.data
@@ -146,13 +146,15 @@ def edit_shop(shop_id):
                 shop.logo_url = filename
             db_sess.commit()
             return redirect(f'/shop/{shop_id}')
+        else:
+            abort(404)
     return render_template('shop_registration.html', form=form)
 
 @login_required
 @app.route('/delete_shop/<int:shop_id>')
 def delete_shop(shop_id):
     db_sess = db_session.create_session()
-    shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+    shop = db_sess.query(Shop).filter(Shop.id == shop_id, Shop.user == current_user).first()
     if shop:
         os.remove(f'./static/photo/{shop.logo_url}')
         db_sess.delete(shop)
