@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, redirect, request, abort
+from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_restful import Api
 from werkzeug.utils import secure_filename
 
@@ -144,6 +144,17 @@ def edit_shop(shop_id):
             db_sess.commit()
             return redirect(f'/shop/{shop_id}')
     return render_template('shop_registration.html', form=form)
+
+@login_required
+@app.route('/delete_shop/<int:shop_id>')
+def delete_shop(shop_id):
+    db_sess = db_session.create_session()
+    shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+    if shop:
+        db_sess.delete(shop)
+        db_sess.commit()
+        return redirect('/my_shops')
+    abort(404)
 
 
 def main():
