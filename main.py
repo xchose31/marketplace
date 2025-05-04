@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request, abort
 from flask_restful import Api
 from werkzeug.utils import secure_filename
 
@@ -106,6 +106,44 @@ def my_shops():
     db_sess = db_session.create_session()
     shops = db_sess.query(Shop).filter(Shop.owner_id == current_user.id).all()
     return render_template('my_shops.html', shops=shops)
+
+
+@login_required
+@app.route('/shop/<int:shop_id>')
+def shop(shop_id):
+    db_sess = db_session.create_session()
+    shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+    if shop:
+        return render_template('shop.html', shop=shop)
+
+
+@login_required
+@app.route('/edit_shop/<int:shop_id>', methods=['GET', 'POST'])
+def edit_shop(shop_id):
+    form = Shop_registration()
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+        if shop:
+            form.name.data = shop.name
+            form.description.data = shop.description
+            form.submit.label.text = 'Изменить'
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+        if shop:
+            shop.name = form.name.data
+            shop.description = form.description.data
+            f = form.logo.data
+            if f:
+                filename = secure_filename(f.filename)
+                f.save(os.path.join('static', 'photo', filename))
+                shop.logo_url = filename
+            db_sess.commit()
+            return redirect(f'/shop/{shop_id}')
+    return render_template('shop_registration.html', form=form)
 
 
 def main():

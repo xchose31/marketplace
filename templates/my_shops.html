@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="shops-container">
+    <h2 style="text-align: center;">Мои магазины</h2>
+    {% if shops %}
+    <div class="shops-list">
+        {% for shop in shops %}
+        <div class="shop-card">
+            <div class="shop-logo">
+                <img src="{{ url_for('static', filename='photo/' + shop.logo_url) }}"
+                     alt="{{ shop.name }} logo"
+                     class="shop-logo-img">
+            </div>
+            <div class="shop-info">
+                <h3 class="shop-name"><a href="/shop/{{shop.id}}">{{ shop.name }}</a></h3>
+                <p class="shop-description">{{ shop.description }}</p>
+                <div class="shop-meta">
+                    <span class="creation-date">Создан: {{ shop.created_date }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-shops">Упс! У вас еще нет магазинов</p>
+    {% endif %}
+</div>
+
+<style>
+    /* Основные стили для контейнера */
+    .shops-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+
+    /* Стили для списка магазинов */
+    .shops-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    /* Стили для карточки магазина */
+    .shop-card {
+        display: flex;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 25px;
+        background-color: #ffffff;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        min-height: 180px;
+    }
+
+    .shop-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Стили для логотипа */
+    .shop-logo {
+        width: 140px;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 30px;
+        flex-shrink: 0;
+    }
+
+    .shop-logo-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    /* Стили для информации о магазине */
+    .shop-info {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .shop-name {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.4em;
+    }
+
+    .shop-description {
+        margin: 0 0 15px 0;
+        color: #666;
+        font-size: 1.1em;
+        line-height: 1.4;
+    }
+
+    /* Стили для мета-информации */
+    .shop-meta {
+        margin-top: auto;
+        text-align: right;
+    }
+
+    .creation-date {
+        color: #888;
+        font-size: 0.9em;
+        font-style: italic;
+    }
+
+    /* Стиль для сообщения об отсутствии магазинов */
+    .no-shops {
+        text-align: center;
+        color: #888;
+        font-style: italic;
+        padding: 30px;
+        font-size: 1.2em;
+    }
+</style>
+{% endblock %}
