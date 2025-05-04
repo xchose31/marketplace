@@ -85,6 +85,8 @@ def create_shop():
             return render_template('shop_registration.html', form=form, message="Магазин с таким названием существует")
         f = form.logo.data
         filename = secure_filename(f.filename)
+        if filename in os.listdir('static/photo'):
+            return render_template('shop_registration.html', form=form, message="Лого с таким названием существует: смените название файла логотипа")
         f.save(os.path.join('static', 'photo', filename))
         shop = Shop(
             name=form.name.data,
@@ -138,6 +140,7 @@ def edit_shop(shop_id):
             shop.description = form.description.data
             f = form.logo.data
             if f:
+                os.remove(f'./static/photo/{shop.logo_url}')
                 filename = secure_filename(f.filename)
                 f.save(os.path.join('static', 'photo', filename))
                 shop.logo_url = filename
@@ -151,6 +154,7 @@ def delete_shop(shop_id):
     db_sess = db_session.create_session()
     shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
     if shop:
+        os.remove(f'./static/photo/{shop.logo_url}')
         db_sess.delete(shop)
         db_sess.commit()
         return redirect('/my_shops')
