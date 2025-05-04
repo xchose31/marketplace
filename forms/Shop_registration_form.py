@@ -6,5 +6,5 @@ from wtforms.validators import DataRequired
 class Shop_registration(FlaskForm):
     name = StringField('Название магазина', validators=[DataRequired()])
     description = StringField('Описание магазина', validators=[DataRequired()])
-    logo = FileField('Логотип', validators=[DataRequired()])
+    logo = FileField('Логотип')
     submit = SubmitField('Зарегистрировать', validators=[DataRequired()])
