@@ -1,10 +1,17 @@
-from flask import Flask, render_template, redirect
+import os
+
+from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_restful import Api
+from werkzeug.utils import secure_filename
+
 from data import db_session
-from flask_login import login_user, login_required, logout_user, current_user, LoginManager
+from flask_login import login_user, logout_user, LoginManager, login_required, current_user
 from forms.RegisterForm import RegisterForm
 from forms.Login_user_form import Login_user_form
-from data.users import User
+from forms.Shop_registration_form import Shop_registration
+from data.models.users import User
+from data.models.shops import Shop
+from data.tests.shop_creation_tests import shop_creation_test
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -16,6 +23,7 @@ app.config['SECRET_KEY'] = 'MARKETPLACE_SECRET_KEY'
 @app.route('/')
 def main_menu():
     return render_template('base.html')
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -61,10 +69,96 @@ def Login_user():
 
     return render_template('login_user.html', form=form)
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect('/')
+
+
+@login_required
+@app.route('/create_shop', methods=['GET', 'POST'])
+def create_shop():
+    form = Shop_registration()
+    if form.validate_on_submit():
+        if not shop_creation_test(form):
+            return render_template('shop_registration.html', form=form, message="Магазин с таким названием существует")
+        f = form.logo.data
+        filename = secure_filename(f.filename)
+        if filename in os.listdir('static/photo'):
+            return render_template('shop_registration.html', form=form, message="Лого с таким названием существует: смените название файла логотипа")
+        f.save(os.path.join('static', 'photo', filename))
+        shop = Shop(
+            name=form.name.data,
+            owner_id=current_user.id,
+            description=form.description.data,
+            logo_url=filename
+        )
+        db_sess = db_session.create_session()
+        db_sess.add(shop)
+        db_sess.commit()
+        return redirect('/')
+
+    return render_template('shop_registration.html', form=form)
+
+
+@login_required
+@app.route('/my_shops')
+def my_shops():
+    db_sess = db_session.create_session()
+    shops = db_sess.query(Shop).filter(Shop.owner_id == current_user.id).all()
+    return render_template('my_shops.html', shops=shops)
+
+
+@login_required
+@app.route('/shop/<int:shop_id>')
+def shop(shop_id):
+    db_sess = db_session.create_session()
+    shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+    if shop:
+        return render_template('shop.html', shop=shop)
+
+
+@login_required
+@app.route('/edit_shop/<int:shop_id>', methods=['GET', 'POST'])
+def edit_shop(shop_id):
+    form = Shop_registration()
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+        if shop:
+            form.name.data = shop.name
+            form.description.data = shop.description
+            form.submit.label.text = 'Изменить'
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+        if shop:
+            shop.name = form.name.data
+            shop.description = form.description.data
+            f = form.logo.data
+            if f:
+                os.remove(f'./static/photo/{shop.logo_url}')
+                filename = secure_filename(f.filename)
+                f.save(os.path.join('static', 'photo', filename))
+                shop.logo_url = filename
+            db_sess.commit()
+            return redirect(f'/shop/{shop_id}')
+    return render_template('shop_registration.html', form=form)
+
+@login_required
+@app.route('/delete_shop/<int:shop_id>')
+def delete_shop(shop_id):
+    db_sess = db_session.create_session()
+    shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+    if shop:
+        os.remove(f'./static/photo/{shop.logo_url}')
+        db_sess.delete(shop)
+        db_sess.commit()
+        return redirect('/my_shops')
+    abort(404)
 
 
 def main():

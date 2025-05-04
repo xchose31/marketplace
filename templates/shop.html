@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="shop-detail-container">
+    <div class="shop-detail-card">
+        <div class="shop-media">
+            <div class="shop-logo">
+                <img src="{{ url_for('static', filename='photo/' + shop.logo_url) }}"
+                     alt="{{ shop.name }} logo"
+                     class="shop-logo-img">
+            </div>
+            <a class="btn btn-primary"  href="/edit_shop/{{ shop.id }}">Изменить</a>
+            <a class="btn btn-danger" href="/delete_shop/{{ shop.id }}">Удалить</a>
+        </div>
+        <div class="shop-info">
+            <h1 class="shop-name">{{ shop.name }}</h1>
+            <div class="shop-description">{{ shop.description }}</div>
+            <div class="shop-meta">
+                <span class="creation-date">Создан: {{ shop.created_date }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .shop-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+
+    .shop-detail-card {
+        display: flex;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 35px;
+        background-color: #ffffff;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        gap: 40px;
+    }
+
+    .shop-media {
+        flex: 0 0 auto;
+    }
+
+    .shop-logo {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        position: sticky;
+        top: 35px;
+    }
+
+    .shop-logo-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    .shop-info {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-width: 0; /* Предотвращает переполнение flex-контейнера */
+    }
+
+    .shop-name {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 2em;
+        word-wrap: break-word;
+    }
+
+    .shop-description {
+        margin: 0 0 20px 0;
+        color: #666;
+        font-size: 1.2em;
+        line-height: 1.5;
+        /* Добавляем поддержку переноса длинных слов */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+
+    .shop-meta {
+        margin-top: 20px;
+        text-align: right;
+    }
+
+    .creation-date {
+        color: #888;
+        font-size: 1em;
+        font-style: italic;
+    }
+
+    /* Медиа-запрос для мобильных устройств */
+    @media (max-width: 768px) {
+        .shop-detail-card {
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .shop-logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            position: static;
+        }
+
+        .shop-name {
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .shop-description {
+            font-size: 1.1em;
+        }
+    }
+</style>
+{% endblock %}
