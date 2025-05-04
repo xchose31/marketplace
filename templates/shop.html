@@ -9,8 +9,10 @@
                      alt="{{ shop.name }} logo"
                      class="shop-logo-img">
             </div>
-            <a class="btn btn-primary"  href="/edit_shop/{{ shop.id }}">Изменить</a>
-            <a class="btn btn-danger" href="/delete_shop/{{ shop.id }}">Удалить</a>
+            {% if shop.user == current_user %}
+                <a class="btn btn-primary"  href="/edit_shop/{{ shop.id }}">Изменить</a>
+                <a class="btn btn-danger" href="/delete_shop/{{ shop.id }}">Удалить</a>
+            {% endif %}
         </div>
         <div class="shop-info">
             <h1 class="shop-name">{{ shop.name }}</h1>
