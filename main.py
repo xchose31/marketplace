@@ -11,6 +11,7 @@ from forms.Login_user_form import Login_user_form
 from forms.Shop_registration_form import Shop_registration
 from data.models.users import User
 from data.models.shops import Shop
+from data.models.products import Product
 from data.tests.shop_creation_tests import shop_creation_test
 
 app = Flask(__name__)
@@ -161,6 +162,13 @@ def delete_shop(shop_id):
         db_sess.commit()
         return redirect('/my_shops')
     abort(404)
+
+# @login_required
+# @app.route('/create_product/<int:shop_id>')
+# def create_product(shop_id):
+#     db_sess = db_session.create_session()
+#     shop = db_sess.query(Shop).get(shop_id)
+#
 
 
 def main():
