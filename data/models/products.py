@@ -10,9 +10,11 @@ class Product(SerializerMixin, SqlAlchemyBase):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     shop_id = Column(Integer, ForeignKey('shops.id'))
-    category_id = Column(Integer)
+    category = Column(String)
     name = Column(String)
     description = Column(String)
     price = Column(Integer)
+    logo_url = Column(String)
     stock_quantity = Column(Integer)
     created_at = Column(String, default=datetime.datetime.now())
+    shop = orm.relationship('Shop')

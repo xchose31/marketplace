@@ -1,4 +1,6 @@
 import os
+from doctest import debug_script
+from pydoc import describe
 
 from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_restful import Api
@@ -9,6 +11,7 @@ from flask_login import login_user, logout_user, LoginManager, login_required, c
 from forms.RegisterForm import RegisterForm
 from forms.Login_user_form import Login_user_form
 from forms.Shop_registration_form import Shop_registration
+from forms.product_creating_form import ProductForm
 from data.models.users import User
 from data.models.shops import Shop
 from data.models.products import Product
@@ -87,7 +90,8 @@ def create_shop():
         f = form.logo.data
         filename = secure_filename(f.filename)
         if filename in os.listdir('static/photo'):
-            return render_template('shop_registration.html', form=form, message="Лого с таким названием существует: смените название файла логотипа")
+            return render_template('shop_registration.html', form=form,
+                                   message="Лого с таким названием существует: смените название файла логотипа")
         f.save(os.path.join('static', 'photo', filename))
         shop = Shop(
             name=form.name.data,
@@ -151,6 +155,7 @@ def edit_shop(shop_id):
             abort(404)
     return render_template('shop_registration.html', form=form)
 
+
 @login_required
 @app.route('/delete_shop/<int:shop_id>')
 def delete_shop(shop_id):
@@ -163,12 +168,46 @@ def delete_shop(shop_id):
         return redirect('/my_shops')
     abort(404)
 
-# @login_required
-# @app.route('/create_product/<int:shop_id>')
-# def create_product(shop_id):
-#     db_sess = db_session.create_session()
-#     shop = db_sess.query(Shop).get(shop_id)
-#
+
+@login_required
+@app.route('/create_product/<int:shop_id>', methods=['GET', 'POST'])
+def create_product(shop_id):
+    db_sess = db_session.create_session()
+    shop = db_sess.query(Shop).get(shop_id)
+    if not shop:
+        abort(404)
+    if shop.user != current_user:
+        abort(403)
+    form = ProductForm()
+    if form.validate_on_submit():
+        f = form.logo.data
+        filename = secure_filename(f.filename)
+        if filename in os.listdir('static/photo'):
+            return render_template('shop_registration.html', form=form,
+                                   message="Лого с таким названием существует: смените название файла логотипа")
+        f.save(os.path.join('static', 'photo', filename))
+        product = Product(
+            shop_id=shop.id,
+            category=form.category,
+            name=form.name,
+            description=form.description,
+            price=form.price,
+            logo_url=filename,
+            stock_quantity=form.stock_quantity
+        )
+        db_sess.add(shop)
+        db_sess.commit()
+        return redirect(f'/product/{product.id}')
+    return render_template('product_creating.html', form=form)
+
+
+@app.route('/product/<int:product_id>')
+def product(product_id):
+    db_sess = db_session.create_session()
+    product = db_sess.query(Product).get(product_id)
+    if product:
+        return render_template('product.html', product=product)
+    abort(404)
 
 
 def main():

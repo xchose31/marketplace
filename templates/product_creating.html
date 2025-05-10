@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block main %}
+<h2>Добавление товара</h2>
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.name.label }}<br>
+    {{ form.name(class="form-control") }}
+    {% for error in form.name.errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.description.label }}<br>
+    {{ form.description(class="form-control") }}
+    {% for error in form.description.errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.category.label }}<br>
+    {{ form.category(class="form-control") }}
+    {% for error in form.category.errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.logo.label }}<br>
+    {{ form.logo(class="form-control") }}
+    {% for error in form.logo.errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.price.label }}<br>
+    {{ form.price(class="form-control") }}
+    {% for error in form.price.errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.stock_quantity.label }}<br>
+    {{ form.stock_quantity(class="form-control") }}
+    {% for error in form.stock_quantity.errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.submit(class="btn btn-secondary") }}
+    {{ form.submit.label }}
+  </p>
+</form>
+{% endblock %}
