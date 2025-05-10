@@ -18,6 +18,7 @@
             <h1 class="shop-name">{{ shop.name }}</h1>
             <div class="shop-description">{{ shop.description }}</div>
             <div class="shop-meta">
+                <a href="/create_product/{{ shop.id }}" class="btn btn-primary">Добавить товар</a><br>
                 <span class="creation-date">Создан: {{ shop.created_date }}</span>
             </div>
         </div>
