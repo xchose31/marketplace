@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block main %}
+
+<div class="container mt-4">
+    <div class="card">
+        {% if product.logo_url %}
+        <img src="{{ product.logo_url }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 400px; object-fit: contain;">
+        {% endif %}
+        <div class="card-body">
+            <h1 class="card-title">{{ product.name }}</h1>
+            <div class="price-block mb-3">
+                <h2 class="text-primary">
+                    {{ "{:,}".format(product.price).replace(',', ' ') }} ₽
+                </h2>
+            </div>
+            <div class="product-info mb-4">
+                <h4>Описание:</h4>
+                <p class="card-text">{{ product.description }}</p>
+
+                <div class="product-details mt-3">
+                    <p><strong>Категория:</strong> {{ product.category }}</p>
+                    <p><strong>В наличии:</strong> {{ product.stock_quantity }} шт.</p>
+                    <p><strong>Магазин:</strong> <a href="/shop/{{ product.shop.id }}">{{ product.shop.name }}</a></p>
+                    <p><strong>Добавлен:</strong> {{ product.created_at }}</p>
+                </div>
+            </div>
+
+            {% if product.stock_quantity > 0 %}
+            <button class="btn btn-primary btn-lg">Добавить в корзину</button>
+            {% else %}
+            <button class="btn btn-secondary btn-lg" disabled>Нет в наличии</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+<style>
+.card {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.price-block {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.product-details p {
+    margin-bottom: 0.5rem;
+}
+
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+}
+</style>

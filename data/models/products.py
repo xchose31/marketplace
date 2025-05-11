@@ -16,5 +16,5 @@ class Product(SerializerMixin, SqlAlchemyBase):
     price = Column(Integer)
     logo_url = Column(String)
     stock_quantity = Column(Integer)
-    created_at = Column(String, default=datetime.datetime.now())
+    created_at = Column(String, default=datetime.date.today())
     shop = orm.relationship('Shop')
