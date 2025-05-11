@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block main %}
 <h2>Добавление товара</h2>
-<form action="" method="post">
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+<form action="" method="post" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
   <p>
     {{ form.name.label }}<br>
