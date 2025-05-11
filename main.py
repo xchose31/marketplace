@@ -120,8 +120,9 @@ def my_shops():
 def shop(shop_id):
     db_sess = db_session.create_session()
     shop = db_sess.query(Shop).filter(Shop.id == shop_id).first()
+    products = db_sess.query(Product).filter(Product.shop_id == shop_id).all()
     if shop:
-        return render_template('shop.html', shop=shop)
+        return render_template('shop.html', shop=shop, products=products)
 
 
 @login_required

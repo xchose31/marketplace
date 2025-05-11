@@ -2,7 +2,9 @@
 
 {% block main %}
 <div class="shop-detail-container">
+    <!-- Карточка магазина -->
     <div class="shop-detail-card">
+        <!-- Информация о магазине -->
         <div class="shop-media">
             <div class="shop-logo">
                 <img src="{{ url_for('static', filename='photo/' + shop.logo_url) }}"
@@ -10,8 +12,8 @@
                      class="shop-logo-img">
             </div>
             {% if shop.user == current_user %}
-                <a class="btn btn-primary"  href="/edit_shop/{{ shop.id }}">Изменить</a>
-                <a class="btn btn-danger" href="/delete_shop/{{ shop.id }}">Удалить</a>
+            <a class="btn btn-primary" href="/edit_shop/{{ shop.id }}">Изменить</a>
+            <a class="btn btn-danger" href="/delete_shop/{{ shop.id }}">Удалить</a>
             {% endif %}
         </div>
         <div class="shop-info">
@@ -23,9 +25,33 @@
             </div>
         </div>
     </div>
+
+    <!-- Карточки товаров внутри магазина -->
+    <div class="product-grid">
+        {% if products %}
+        {% for product in products %}
+        <div class="card product-card">
+            <!-- Блок с текстом и кнопкой слева -->
+            <div class="card-left">
+                <h5 class="card-title"><a href="/product/{{ product.id }}">{{ product.name }}</a></h5>
+                <p class="card-text">{{ product.description }}</p>
+                <a href="/add_to_cart" class="btn btn-primary btn-sm cart-btn"><i class="bi bi-cart-plus"></i> В корзину</a>
+            </div>
+            <!-- Блок с изображением справа -->
+            <div class="card-right">
+                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}" class="card-img-top"
+                     alt="Лого товара">
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>В магазине пока нет товаров.</p>
+        {% endif %}
+    </div>
 </div>
 
 <style>
+    /* Основные стили контейнера и карточки магазина (оставляем без изменений) */
     .shop-detail-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -38,8 +64,9 @@
         border-radius: 12px;
         padding: 35px;
         background-color: #ffffff;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         gap: 40px;
+        margin-bottom: 20px;
     }
 
     .shop-media {
@@ -67,7 +94,7 @@
         flex: 1 1 auto;
         display: flex;
         flex-direction: column;
-        min-width: 0; /* Предотвращает переполнение flex-контейнера */
+        min-width: 0;
     }
 
     .shop-name {
@@ -75,7 +102,6 @@
         margin-bottom: 20px;
         color: #333;
         font-size: 2em;
-        word-wrap: break-word;
     }
 
     .shop-description {
@@ -83,10 +109,6 @@
         color: #666;
         font-size: 1.2em;
         line-height: 1.5;
-        /* Добавляем поддержку переноса длинных слов */
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
     }
 
     .shop-meta {
@@ -100,27 +122,129 @@
         font-style: italic;
     }
 
-    /* Медиа-запрос для мобильных устройств */
+    /* Полностью переработанные стили для карточек товаров */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .product-card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-right {
+        height: 180px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .card-right img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .card-right img {
+        transform: scale(1.05);
+    }
+
+    .card-left {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        margin: 0 0 10px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .card-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .card-title a:hover {
+        color: #0066cc;
+    }
+
+    .card-text {
+        margin: 0 0 15px 0;
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        flex-grow: 1;
+    }
+
+    .cart-btn {
+        align-self: flex-start;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .cart-btn:hover {
+        background-color: #0052a3;
+        text-decoration: none;
+    }
+
+    /* Адаптивность */
     @media (max-width: 768px) {
         .shop-detail-card {
             flex-direction: column;
-            padding: 20px;
+            gap: 25px;
         }
 
         .shop-logo {
+            position: static;
             width: 150px;
             height: 150px;
-            margin: 0 auto 20px;
-            position: static;
+            margin: 0 auto;
         }
 
-        .shop-name {
-            text-align: center;
-            font-size: 1.5em;
+        .product-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+    }
+
+    @media (max-width: 480px) {
+        .shop-detail-container {
+            padding: 15px;
         }
 
-        .shop-description {
-            font-size: 1.1em;
+        .shop-detail-card {
+            padding: 20px;
+        }
+
+        .product-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>

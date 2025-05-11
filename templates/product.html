@@ -3,16 +3,22 @@
 
 <div class="container mt-4">
     <div class="card">
-        {% if product.logo_url %}
-        <img src="{{ product.logo_url }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 400px; object-fit: contain;">
-        {% endif %}
-        <div class="card-body">
-            <h1 class="card-title">{{ product.name }}</h1>
-            <div class="price-block mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="card-title">{{ product.name }}</h1>
                 <h2 class="text-primary">
                     {{ "{:,}".format(product.price).replace(',', ' ') }} ₽
                 </h2>
             </div>
+            {% if product.logo_url %}
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}"
+                     alt="{{ product.name }} logo"
+                     class="shop-logo-img">
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-body">
             <div class="product-info mb-4">
                 <h4>Описание:</h4>
                 <p class="card-text">{{ product.description }}</p>
@@ -33,17 +39,31 @@
         </div>
     </div>
 </div>
-{% endblock %}
 <style>
 .card {
     border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.card-img-top {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    background-color: #f8f9fa;
+.card-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between; /* Размещает содержимое по краям */
+    align-items: center; /* Выравнивает содержимое по центру вертикально */
+}
+
+.image-container {
+    width: 200px; /* Ширина контейнера для изображения */
+    height: 200px; /* Высота контейнера для изображения */
+}
+
+.shop-logo-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Сохраняет пропорции изображения внутри контейнера */
+}
+
+.card-body {
     padding: 20px;
 }
 
@@ -61,3 +81,4 @@
     font-size: 1.1rem;
 }
 </style>
+{% endblock %}
