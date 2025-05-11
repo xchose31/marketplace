@@ -181,25 +181,28 @@ def create_product(shop_id):
     form = ProductForm()
     if form.validate_on_submit():
         f = form.logo.data
+        print(f)
+        if not f:
+            return render_template('product_creating.html', form=form,
+                                   message="No file was supplied. Please upload a valid file.")
         filename = secure_filename(f.filename)
         if filename in os.listdir('static/photo'):
-            return render_template('shop_registration.html', form=form,
-                                   message="Лого с таким названием существует: смените название файла логотипа")
+            return render_template('product_creating.html', form=form,
+                                   message="Файл с таким именем уже существует: измените название файла")
         f.save(os.path.join('static', 'photo', filename))
         product = Product(
             shop_id=shop.id,
-            category=form.category,
-            name=form.name,
-            description=form.description,
-            price=form.price,
+            category=form.category.data,
+            name=form.name.data,
+            description=form.description.data,
+            price=form.price.data,
             logo_url=filename,
-            stock_quantity=form.stock_quantity
+            stock_quantity=form.stock_quantity.data
         )
-        db_sess.add(shop)
+        db_sess.add(product)
         db_sess.commit()
         return redirect(f'/product/{product.id}')
     return render_template('product_creating.html', form=form)
-
 
 @app.route('/product/<int:product_id>')
 def product(product_id):

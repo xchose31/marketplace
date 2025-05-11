@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FileField, IntegerField
+from wtforms.fields import EmailField, PasswordField, SubmitField, BooleanField, StringField, FileField, IntegerField
 from wtforms.validators import DataRequired
-
 
 class ProductForm(FlaskForm):
     name = StringField('Название товара', validators=[DataRequired()])
