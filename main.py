@@ -1,6 +1,5 @@
 import os
-from doctest import debug_script
-from pydoc import describe
+import random
 
 from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_restful import Api
@@ -26,7 +25,19 @@ app.config['SECRET_KEY'] = 'MARKETPLACE_SECRET_KEY'
 
 @app.route('/')
 def main_menu():
-    return render_template('base.html')
+    db_sess = db_session.create_session()
+    product_ids = db_sess.query(Product.id).all()
+    product_ids = [id[0] for id in product_ids]
+    if len(product_ids) > 6:
+        product_ids = random.sample(product_ids, 6)
+    products = [db_sess.query(Product).get(id) for id in product_ids]
+    return render_template('base.html', products=products)
+
+@app.route('/catalog')
+def catalog():
+    db_sess = db_session.create_session()
+    products = db_sess.query(Product).all()
+    return render_template('catalog.html', products=products)
 
 
 @login_manager.user_loader
@@ -204,6 +215,7 @@ def create_product(shop_id):
         db_sess.commit()
         return redirect(f'/product/{product.id}')
     return render_template('product_creating.html', form=form)
+
 
 @app.route('/product/<int:product_id>')
 def product(product_id):

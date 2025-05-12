@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block main %}
 <h2>Войти в аккаунт</h2>
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
