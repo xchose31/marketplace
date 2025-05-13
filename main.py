@@ -252,9 +252,9 @@ def add_to_cart(product_id):
         else:
             cart.data.append({'product_id': product_id, 'quantity': 1, 'price': product.price})
     db_sess.commit()
-    cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
     return redirect('/cart')
 
+@login_required
 @app.route('/cart')
 def cart():
     db_sess = db_session.create_session()
@@ -265,6 +265,18 @@ def cart():
         js['logo_url'] = f'/static/photo/{product.logo_url}'
     print(cart.data)
     return render_template('cart.html', products=cart.data)
+
+@login_required
+@app.route('/cart/remove/<int:product_id>', methods=['GET', 'POST'])
+def remove_from_cart(product_id):
+    db_sess = db_session.create_session()
+    cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    for js in cart.data:
+        if js['product_id'] == product_id:
+            cart.data.remove(js)
+            break
+    db_sess.commit()
+    return redirect('/cart')
 
 
 def main():
