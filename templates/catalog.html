@@ -9,7 +9,7 @@
             <div class="card-left">
                 <h5 class="card-title"><a href="/product/{{ product.id }}">{{ product.name }}</a></h5>
                 <p class="card-text">{{ product.description }}</p>
-                <a href="/add_to_cart" class="btn btn-primary btn-sm cart-btn"><i class="bi bi-cart-plus"></i>{{ product.price }} ₽</a>
+                <a href="/add_to_cart/{{ product.id }}" class="btn btn-primary btn-sm cart-btn"><i class="bi bi-cart-plus"></i>{{ product.price }} ₽</a>
             </div>
             <!-- Правая часть карточки с изображением -->
             <div class="card-right">

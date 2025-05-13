@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="container mt-5">
+    <h1 class="mb-4">Корзина</h1>
+    
+    {% if products %}
+        <div class="row">
+            {% for item in products %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <img src="{{ item['logo_url'] }}" class="card-img-top" alt="{{ item.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item['name'] }}</h5>
+                            <p class="card-text">Цена: {{ item['price'] }} ₽</p>
+                            <p class="card-text">Количество: {{ item['quantity'] }}</p>
+                            <p class="card-text">Итого: {{ item['price'] * item['quantity'] }} ₽</p>
+                            <form method="POST" action="/cart/update">
+                                <input type="hidden" name="product_id" value="{{ item['product.id'] }}">
+                                <div class="input-group mb-2">
+                                    <input type="number" name="quantity" class="form-control" value="{{ item['quantity'] }}" min="1">
+                                    <button type="submit" class="btn btn-primary">Обновить</button>
+                                </div>
+                            </form>
+                            <form method="POST" action="/cart/remove">
+                                <input type="hidden" name="product_id" value="{{ item['product.id']}}">
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-12 d-flex justify-content-between align-items-center">
+                <h4>Общая сумма: {{ total_price }} ₽</h4>
+                <a href="/checkout" class="btn btn-success">Оформить заказ</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Корзина пуста. <a href="/catalog" class="alert-link">Перейти в каталог</a>.
+        </div>
+    {% endif %}
+</div>
+<style>
+.card {
+    width: 270px; /* Фиксированная ширина карточки */
+    height: 470px; /* Фиксированная высота карточки */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Распределение элементов */
+}
+
+.card img {
+    max-width: 100%; /* Изображение вписывается по ширине */
+    max-height: 40%; /* Изображение не превышает половину высоты карточки */
+    object-fit: cover; /* Обрезка не происходит, изображение сохраняет пропорции */
+}
+</style>
+{% endblock %}

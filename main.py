@@ -1,5 +1,6 @@
 import os
 import random
+from ast import iter_child_nodes
 
 from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_restful import Api
@@ -14,6 +15,7 @@ from forms.product_creating_form import ProductForm
 from data.models.users import User
 from data.models.shops import Shop
 from data.models.products import Product
+from data.models.shopping_cart import Shopping_cart
 from data.tests.shop_creation_tests import shop_creation_test
 
 app = Flask(__name__)
@@ -67,7 +69,13 @@ def register_user():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/')
+
+        cart = Shopping_cart(
+            user_id=user.id
+        )
+        db_sess.add(cart)
+        db_sess.commit()
+        return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -224,6 +232,39 @@ def product(product_id):
     if product:
         return render_template('product.html', product=product)
     abort(404)
+
+@login_required
+@app.route('/add_to_cart/<int:product_id>')
+def add_to_cart(product_id):
+    db_sess = db_session.create_session()
+    cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    product = db_sess.query(Product).get(product_id)
+    if not cart:
+        cart = Shopping_cart(user_id=current_user.id, data=[])
+        cart.data.append({'product_id': product_id, 'quantity': 1, 'price': product.price})
+        db_sess.add(cart)
+    else:
+        if product_id in [item['product_id'] for item in cart.data]:
+            for item in cart.data:
+                if item['product_id'] == product_id:
+                    item['quantity'] += 1
+                    break
+        else:
+            cart.data.append({'product_id': product_id, 'quantity': 1, 'price': product.price})
+    db_sess.commit()
+    cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    return redirect('/cart')
+
+@app.route('/cart')
+def cart():
+    db_sess = db_session.create_session()
+    cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    for js in cart.data:
+        product = db_sess.query(Product).get(js['product_id'])
+        js['name'] = product.name
+        js['logo_url'] = f'/static/photo/{product.logo_url}'
+    print(cart.data)
+    return render_template('cart.html', products=cart.data)
 
 
 def main():
