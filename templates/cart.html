@@ -22,7 +22,7 @@
                                     <button type="submit" class="btn btn-primary">Обновить</button>
                                 </div>
                             </form>
-                            <form method="POST" action="/cart/remove">
+                            <form method="POST" action="/cart/remove/{{ item['product_id'] }}">
                                 <input type="hidden" name="product_id" value="{{ item['product.id']}}">
                                 <button type="submit" class="btn btn-danger">Удалить</button>
                             </form>
