@@ -16,14 +16,14 @@
                             <p class="card-text">Количество: {{ item['quantity'] }}</p>
                             <p class="card-text">Итого: {{ item['price'] * item['quantity'] }} ₽</p>
                             <form method="POST" action="/cart/update">
-                                <input type="hidden" name="product_id" value="{{ item['product.id'] }}">
+                                <input type="hidden" name="product_id" value="{{ item['product_id'] }}">
                                 <div class="input-group mb-2">
                                     <input type="number" name="quantity" class="form-control" value="{{ item['quantity'] }}" min="1">
                                     <button type="submit" class="btn btn-primary">Обновить</button>
                                 </div>
                             </form>
-                            <form method="POST" action="/cart/remove/{{ item['product_id'] }}">
-                                <input type="hidden" name="product_id" value="{{ item['product.id']}}">
+                            <form method="POST" action="/cart/remove">
+                                <input type="hidden" name="product_id" value="{{ item['product_id'] }}">
                                 <button type="submit" class="btn btn-danger">Удалить</button>
                             </form>
                         </div>
@@ -33,7 +33,7 @@
         </div>
         <div class="row mt-4">
             <div class="col-md-12 d-flex justify-content-between align-items-center">
-                <h4>Общая сумма: {{ total_price }} ₽</h4>
+                <h4>Общая сумма: {{ final_sum }} ₽</h4>
                 <a href="/checkout" class="btn btn-success">Оформить заказ</a>
             </div>
         </div>
