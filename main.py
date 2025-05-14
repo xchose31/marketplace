@@ -4,6 +4,7 @@ from ast import iter_child_nodes
 
 from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_restful import Api
+from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.utils import secure_filename
 
 from data import db_session
@@ -259,22 +260,41 @@ def add_to_cart(product_id):
 def cart():
     db_sess = db_session.create_session()
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    final_sum = 0
     for js in cart.data:
         product = db_sess.query(Product).get(js['product_id'])
         js['name'] = product.name
         js['logo_url'] = f'/static/photo/{product.logo_url}'
-    print(cart.data)
-    return render_template('cart.html', products=cart.data)
+        final_sum += js['price'] * js['quantity']
+    return render_template('cart.html', products=cart.data, final_sum=final_sum)
 
 @login_required
-@app.route('/cart/remove/<int:product_id>', methods=['GET', 'POST'])
-def remove_from_cart(product_id):
+@app.route('/cart/remove', methods=['GET', 'POST'])
+def remove_from_cart():
+    product_id = request.form.get('product_id')
+    print(product_id)
     db_sess = db_session.create_session()
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
     for js in cart.data:
-        if js['product_id'] == product_id:
+        if js['product_id'] == int(product_id):
             cart.data.remove(js)
             break
+    db_sess.commit()
+    return redirect('/cart')
+
+@login_required
+@app.route('/cart/update', methods=['GET', 'POST'])
+def update_cart():
+    product_id = int(request.form.get('product_id'))
+    quantity = int(request.form.get('quantity'))
+    print(product_id, quantity)
+    db_sess = db_session.create_session()
+    cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    for elem in cart.data:
+        if product_id == elem['product_id']:
+            elem['quantity'] = quantity
+    print(cart.data)
+    flag_modified(cart, "data")
     db_sess.commit()
     return redirect('/cart')
 
