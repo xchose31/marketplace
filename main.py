@@ -274,6 +274,8 @@ def delete_product(product_id):
     db_sess = db_session.create_session()
     product = db_sess.query(Product).get(product_id)
     if product:
+        if product.shop.user != current_user:
+            abort(403)
         product_delete_test(product.id)
         os.remove(f'./static/photo/{product.logo_url}')
         db_sess.delete(product)
@@ -337,7 +339,6 @@ def cart():
 @app.route('/cart/remove', methods=['GET', 'POST'])
 def remove_from_cart():
     product_id = request.form.get('product_id')
-    print(product_id)
     db_sess = db_session.create_session()
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
     for js in cart.data:
