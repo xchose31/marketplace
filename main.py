@@ -20,6 +20,9 @@ from data.tests.shop_creation_tests import shop_creation_test
 from data.tests.product_edit_test import product_edit_test
 from data.tests.product_delete_test import product_delete_test
 
+from data.api.products_resource import ProductsResource, ProductsListResource
+from data.api.shops_resources import ShopsResource, ShopsListResource
+
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -412,6 +415,10 @@ def checkout():
 
 def main():
     db_session.global_init('db/market.db')
+    api.add_resource(ProductsResource, '/api/products/<int:product_id>')
+    api.add_resource(ProductsListResource, '/api/products')
+    api.add_resource(ShopsResource, '/api/shops/<int:shop_id>')
+    api.add_resource(ShopsListResource, '/api/shops')
     app.run(host='127.0.0.1', port=8080)
 
 
