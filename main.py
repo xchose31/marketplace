@@ -353,6 +353,8 @@ def add_to_cart(product_id):
 @app.route('/cart')
 def cart():
     db_sess = db_session.create_session()
+    if not current_user.is_authenticated:
+        abort(403)
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
     if not cart:
         cart = Shopping_cart(user_id=current_user.id,
