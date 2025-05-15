@@ -268,6 +268,7 @@ def edit_product(product_id):
         form.price.data = product.price
         form.stock_quantity.data = product.stock_quantity
         form.category.data = product.category
+        form.submit.label.text = 'Изменить'
     if form.validate_on_submit():
         # Обновление данных товара
         product.name = form.name.data
