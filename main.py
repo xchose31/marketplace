@@ -202,7 +202,6 @@ def create_product(shop_id):
     form = ProductForm()
     if form.validate_on_submit():
         f = form.logo.data
-        print(f)
         if not f:
             return render_template('product_creating.html', form=form,
                                    message="No file was supplied. Please upload a valid file.")
@@ -295,13 +294,15 @@ def remove_from_cart():
 def update_cart():
     product_id = int(request.form.get('product_id'))
     quantity = int(request.form.get('quantity'))
-    print(product_id, quantity)
     db_sess = db_session.create_session()
+    max_q = db_sess.query(Product).get(product_id).stock_quantity
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
     for elem in cart.data:
         if product_id == elem['product_id']:
+            if quantity > max_q:
+                flash(f'Превышено количество товара: в наличии {max_q}', 'warning')
+                return redirect('/cart')
             elem['quantity'] = quantity
-    print(cart.data)
     flag_modified(cart, "data")
     db_sess.commit()
     return redirect('/cart')
@@ -328,6 +329,11 @@ def checkout():
         for email in users:
             if send_email(email, "Пришел заказ", users[email], current_user):
                 print("Email was sent")
+                for elem in users[email]:
+                    product = db_sess.query(Product).get(elem['id'])
+                    product.stock_quantity -= elem['quantity']
+                    flag_modified(product, 'stock_quantity')
+                    db_sess.commit()
             else:
                 print("Email was not sent")
                 flash(
@@ -337,7 +343,8 @@ def checkout():
     db_sess.delete(cart)
     db_sess.commit()
     flash(
-        "Ваш заказ успешно оформлен. Ожидайте, пока с вами свяжутся представители магазина. Если этого не произойдет, проверьте данные для связи в профиле и повторите заказ.", "success")
+        "Ваш заказ успешно оформлен. Ожидайте, пока с вами свяжутся представители магазина. Если этого не произойдет, "
+        "проверьте данные для связи в профиле и повторите заказ.", "success")
     return redirect('/cart')
 
 
