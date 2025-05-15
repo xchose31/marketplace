@@ -17,6 +17,8 @@ from data.models.shops import Shop
 from data.models.products import Product
 from data.models.shopping_cart import Shopping_cart
 from data.tests.shop_creation_tests import shop_creation_test
+from data.tests.product_edit_test import product_edit_test
+from data.tests.product_delete_test import product_delete_test
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -230,14 +232,11 @@ def create_product(shop_id):
 def edit_product(product_id):
     db_sess = db_session.create_session()
     product = db_sess.query(Product).get(product_id)
-
     if not product:
-        abort(404)  # Товар не найден
-
+        abort(404)
     shop = db_sess.query(Shop).get(product.shop_id)
     if not shop or shop.user != current_user:
-        abort(403)  # Доступ запрещен
-
+        abort(403)
     form = ProductForm()
     if request.method == 'GET':
         # Заполнение формы текущими данными товара
@@ -246,7 +245,6 @@ def edit_product(product_id):
         form.price.data = product.price
         form.stock_quantity.data = product.stock_quantity
         form.category.data = product.category
-
     if form.validate_on_submit():
         # Обновление данных товара
         product.name = form.name.data
@@ -254,15 +252,10 @@ def edit_product(product_id):
         product.price = form.price.data
         product.stock_quantity = form.stock_quantity.data
         product.category = form.category.data
-
-        # Проверка, загрузил ли пользователь новый файл логотипа
         f = form.logo.data
         if f:
-            # Удаляем старый логотип
             if product.logo_url and os.path.exists(f'./static/photo/{product.logo_url}'):
                 os.remove(f'./static/photo/{product.logo_url}')
-
-            # Сохраняем новый логотип
             filename = secure_filename(f.filename)
             if filename in os.listdir('static/photo'):
                 flash("Файл с таким именем уже существует. Переименуйте загружаемый файл", "warning")
@@ -270,9 +263,25 @@ def edit_product(product_id):
             f.save(os.path.join('static', 'photo', filename))
             product.logo_url = filename
         db_sess.commit()
-        return redirect(f'/product/{product_id}')  # Перенаправление на страницу товара
-
+        product_edit_test(product)
+        return redirect(f'/product/{product_id}')
     return render_template('product_creating.html', form=form, product=product)
+
+
+@login_required
+@app.route('/delete_product/<int:product_id>')
+def delete_product(product_id):
+    db_sess = db_session.create_session()
+    product = db_sess.query(Product).get(product_id)
+    if product:
+        product_delete_test(product.id)
+        os.remove(f'./static/photo/{product.logo_url}')
+        db_sess.delete(product)
+        db_sess.commit()
+        db_sess.close()
+        return redirect('/catalog')
+    abort(404)
+
 
 
 @app.route('/product/<int:product_id>')
@@ -355,6 +364,7 @@ def update_cart():
             elem['quantity'] = quantity
     flag_modified(cart, "data")
     db_sess.commit()
+    db_sess.close()
     return redirect('/cart')
 
 
@@ -392,6 +402,7 @@ def checkout():
                 return redirect('/cart')
     db_sess.delete(cart)
     db_sess.commit()
+    db_sess.close()
     flash(
         "Ваш заказ успешно оформлен. Ожидайте, пока с вами свяжутся представители магазина. Если этого не произойдет, "
         "проверьте данные для связи в профиле и повторите заказ.", "success")
