@@ -70,6 +70,9 @@
         {% endfor %}
     </p>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {% if current_user.is_authenticated %}
+    <a class="btn btn-danger" href="/logout">Выйти</a>
+    {% endif %}
 </form>
 
 {% endblock %}

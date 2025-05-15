@@ -12,6 +12,7 @@ from forms.RegisterForm import RegisterForm
 from forms.Login_user_form import Login_user_form
 from forms.Shop_registration_form import Shop_registration
 from forms.product_creating_form import ProductForm
+from forms.UserEditForm import UserEditForm
 from data.models.users import User
 from data.models.shops import Shop
 from data.models.products import Product
@@ -103,6 +104,35 @@ def Login_user():
 def logout():
     logout_user()
     return redirect('/')
+
+@login_required
+@app.route('/edit_user', methods=['GET', 'POST'])
+def edit_user():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.id)
+    if not user:
+        abort(404)
+    form = RegisterForm()
+    if request.method == 'GET':
+        form.name.data = user.name
+        form.surname.data = user.surname
+        form.address.data = user.address
+        form.phone_number.data = user.phone_number
+        form.email.data = user.email
+        form.submit.label.text = 'Изменить'
+    if form.validate_on_submit():
+        user.name = form.name.data
+        user.surname = form.surname.data
+        user.address = form.address.data
+        user.phone_number = form.phone_number.data
+        user.email = form.email.data
+        user.set_password(form.password.data)
+        db_sess.commit()
+        login_user(user)
+        return redirect('/')
+    return render_template('register.html', form=form)
+
+
 
 
 @login_required
@@ -286,7 +316,6 @@ def delete_product(product_id):
         db_sess.close()
         return redirect('/catalog')
     abort(404)
-
 
 
 @app.route('/product/<int:product_id>')
