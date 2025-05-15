@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block main %}
 <h2>Войти в аккаунт</h2>
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
@@ -30,5 +33,6 @@
     <p>
         {{ form.submit(type="submit", class="btn btn-primary") }}
     </p>
+    <a href="/register" class="btn btn-secondary">Зарегистрироваться</a>
 </form>
 {% endblock %}

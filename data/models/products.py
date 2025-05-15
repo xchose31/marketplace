@@ -5,14 +5,16 @@ from sqlalchemy_serializer import SerializerMixin
 from data.db_session import SqlAlchemyBase
 
 
-class Shop(SqlAlchemyBase, SerializerMixin):
-    __tablename__ = 'shops'
+class Product(SerializerMixin, SqlAlchemyBase):
+    __tablename__ = 'products'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    shop_id = Column(Integer, ForeignKey('shops.id'))
+    category = Column(String)
     name = Column(String)
     description = Column(String)
+    price = Column(Integer)
     logo_url = Column(String)
-    created_date = Column(String, default=datetime.date.today())
-    rating = Column(Integer)
-    user = orm.relationship('User')
+    stock_quantity = Column(Integer)
+    created_at = Column(String, default=datetime.date.today())
+    shop = orm.relationship('Shop')

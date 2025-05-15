@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block main %}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="card-title">{{ product.name }}</h1>
+                <h2 class="text-primary">
+                    {{ "{:,}".format(product.price).replace(',', ' ') }} ₽
+                </h2>
+            </div>
+            {% if product.logo_url %}
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}"
+                     alt="{{ product.name }} logo"
+                     class="shop-logo-img">
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="product-info mb-4">
+                <h4>Описание:</h4>
+                <p class="card-text">{{ product.description }}</p>
+
+                <div class="product-details mt-3">
+                    <p><strong>Категория:</strong> {{ product.category }}</p>
+                    <p><strong>В наличии:</strong> {{ product.stock_quantity }} шт.</p>
+                    <p><strong>Магазин:</strong> <a href="/shop/{{ product.shop.id }}">{{ product.shop.name }}</a></p>
+                    <p><strong>Добавлен:</strong> {{ product.created_at }}</p>
+                </div>
+            </div>
+
+            {% if product.stock_quantity > 0 %}
+            <a href="/add_to_cart/{{ product.id }}"><button class="btn btn-primary btn-lg">Добавить в корзину</button></a>
+            {% else %}
+            <button class="btn btn-secondary btn-lg" disabled>Нет в наличии</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<style>
+.card {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between; /* Размещает содержимое по краям */
+    align-items: center; /* Выравнивает содержимое по центру вертикально */
+}
+
+.image-container {
+    width: 200px; /* Ширина контейнера для изображения */
+    height: 200px; /* Высота контейнера для изображения */
+}
+
+.shop-logo-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Сохраняет пропорции изображения внутри контейнера */
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.price-block {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.product-details p {
+    margin-bottom: 0.5rem;
+}
+
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+}
+</style>
+{% endblock %}

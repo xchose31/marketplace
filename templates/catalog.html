@@ -1,55 +1,24 @@
 {% extends "base.html" %}
-
 {% block main %}
-<div class="shop-detail-container">
-    <!-- Карточка магазина -->
-    <div class="shop-detail-card">
-        <!-- Информация о магазине -->
-        <div class="shop-media">
-            <div class="shop-logo">
-                <img src="{{ url_for('static', filename='photo/' + shop.logo_url) }}"
-                     alt="{{ shop.name }} logo"
-                     class="shop-logo-img">
-            </div>
-            {% if shop.user == current_user %}
-            <a class="btn btn-primary" href="/edit_shop/{{ shop.id }}">Изменить</a>
-            <a class="btn btn-danger" href="/delete_shop/{{ shop.id }}">Удалить</a>
-            {% endif %}
-        </div>
-        <div class="shop-info">
-            <h1 class="shop-name">{{ shop.name }}</h1>
-            <div class="shop-description">{{ shop.description }}</div>
-            <div class="shop-meta">
-                <a href="/create_product/{{ shop.id }}" class="btn btn-primary">Добавить товар</a><br>
-                <span class="creation-date">Создан: {{ shop.created_date }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Карточки товаров внутри магазина -->
+<div class="products-section container my-5">
+    <h2>Товары</h2>
     <div class="product-grid">
-        {% if products %}
-        {% for product in products %}
+        {% for product in products[:6] %}
         <div class="card product-card">
-            <!-- Блок с текстом и кнопкой слева -->
+            <!-- Левая часть карточки с описанием и кнопкой -->
             <div class="card-left">
                 <h5 class="card-title"><a href="/product/{{ product.id }}">{{ product.name }}</a></h5>
                 <p class="card-text">{{ product.description }}</p>
-                <a href="/add_to_cart" class="btn btn-primary btn-sm cart-btn"><i class="bi bi-cart-plus"></i> В корзину</a>
+                <a href="/add_to_cart/{{ product.id }}" class="btn btn-primary btn-sm cart-btn"><i class="bi bi-cart-plus"></i>{{ product.price }} ₽</a>
             </div>
-            <!-- Блок с изображением справа -->
+            <!-- Правая часть карточки с изображением -->
             <div class="card-right">
-                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}" class="card-img-top"
-                     alt="Лого товара">
+                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}" class="card-img-top" alt="Лого товара">
             </div>
         </div>
         {% endfor %}
-        {% else %}
-        <p>В магазине пока нет товаров.</p>
-        {% endif %}
     </div>
 </div>
-
 <style>
     /* Основные стили контейнера и карточки магазина (оставляем без изменений) */
     .shop-detail-container {
@@ -248,4 +217,5 @@
         }
     }
 </style>
+
 {% endblock %}
