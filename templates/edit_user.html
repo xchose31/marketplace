@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Редактирование профиля</h1>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.name.label }}<br>
+            {{ form.name(class="form-control") }}
+        </div>
+        <div>
+            {{ form.surname.label }}<br>
+            {{ form.surname(class="form-control") }}
+        </div>
+        <div>
+            {{ form.address.label }}<br>
+            {{ form.address(class="form-control") }}
+        </div>
+        <div>
+            {{ form.phone_number.label }}<br>
+            {{ form.phone_number(class="form-control") }}
+        </div>
+        <div>
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+{% endblock %}

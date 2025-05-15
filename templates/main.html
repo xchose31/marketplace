@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 {% block main %}
-<div class="products-section container my-5">
-    <h2>Товары</h2>
-    <div class="product-grid">
-        {% for product in products[:6] %}
+
+<div class="product-grid">
+        {% if products %}
+        {% for product in products %}
         <div class="card product-card">
-            <!-- Левая часть карточки с описанием и кнопкой -->
             <div class="card-left">
                 <h5 class="card-title"><a href="/product/{{ product.id }}">{{ product.name }}</a></h5>
                 <p class="card-text">{{ product.description }}</p>
-                {% if product.stock_quantity > 0 %}
-                <a href="/add_to_cart/{{ product.id }}" class="btn btn-primary btn-sm cart-btn"><i class="bi bi-cart-plus"></i>{{ product.price }} ₽</a>
-                {% else %}
-                <button class="btn btn-secondary btn-lg" disabled>Нет в наличии</button>
-                {% endif %}
+                <div class="card-buttons">
+                    <a href="/add_to_cart/{{ product.id }}" class="btn btn-primary btn-sm cart-btn">
+                        <i class="bi bi-cart-plus"></i> В корзину
+                    </a>
+
+                </div>
             </div>
-            <!-- Правая часть карточки с изображением -->
+
             <div class="card-right">
-                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}" class="card-img-top" alt="Лого товара">
+                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}" class="card-img-top"
+                     alt="Лого товара">
             </div>
+            {% endfor %}
+            {% endif %}
         </div>
-        {% endfor %}
-    </div>
 </div>
 <style>
-    /* Основные стили контейнера и карточки магазина (оставляем без изменений) */
     .shop-detail-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -95,7 +95,6 @@
         font-style: italic;
     }
 
-    /* Полностью переработанные стили для карточек товаров */
     .product-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -168,6 +167,17 @@
         flex-grow: 1;
     }
 
+    .card-buttons {
+    display: flex;
+    gap: 10px; /* Расстояние между кнопками */
+    flex-wrap: wrap; /* Перенос кнопок, если не хватает места */
+    }
+
+    .card-buttons .btn {
+    flex: 0 1 auto; /* Кнопки остаются гибкими, но не растягиваются */
+    }
+
+
     .cart-btn {
         align-self: flex-start;
         background-color: #0066cc;
@@ -188,7 +198,6 @@
         text-decoration: none;
     }
 
-    /* Адаптивность */
     @media (max-width: 768px) {
         .shop-detail-card {
             flex-direction: column;

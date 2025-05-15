@@ -17,6 +17,11 @@ from data.models.shops import Shop
 from data.models.products import Product
 from data.models.shopping_cart import Shopping_cart
 from data.tests.shop_creation_tests import shop_creation_test
+from data.tests.product_edit_test import product_edit_test
+from data.tests.product_delete_test import product_delete_test
+
+from data.api.products_resource import ProductsResource, ProductsListResource
+from data.api.shops_resources import ShopsResource, ShopsListResource
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -24,23 +29,14 @@ login_manager.init_app(app)
 api = Api(app)
 app.config['SECRET_KEY'] = 'MARKETPLACE_SECRET_KEY'
 
-
-@app.route('/')
-def main_menu():
-    db_sess = db_session.create_session()
-    product_ids = db_sess.query(Product.id).all()
-    product_ids = [id[0] for id in product_ids]
-    if len(product_ids) > 6:
-        product_ids = random.sample(product_ids, 6)
-    products = [db_sess.query(Product).get(id) for id in product_ids]
-    return render_template('base.html', products=products)
-
-
 @app.route('/catalog')
+@app.route('/')
 def catalog():
     db_sess = db_session.create_session()
     products = db_sess.query(Product).all()
     return render_template('catalog.html', products=products)
+
+
 
 
 @login_manager.user_loader
@@ -98,6 +94,35 @@ def Login_user():
 def logout():
     logout_user()
     return redirect('/')
+
+@login_required
+@app.route('/edit_user', methods=['GET', 'POST'])
+def edit_user():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.id)
+    if not user:
+        abort(404)
+    form = RegisterForm()
+    if request.method == 'GET':
+        form.name.data = user.name
+        form.surname.data = user.surname
+        form.address.data = user.address
+        form.phone_number.data = user.phone_number
+        form.email.data = user.email
+        form.submit.label.text = 'Изменить'
+    if form.validate_on_submit():
+        user.name = form.name.data
+        user.surname = form.surname.data
+        user.address = form.address.data
+        user.phone_number = form.phone_number.data
+        user.email = form.email.data
+        user.set_password(form.password.data)
+        db_sess.commit()
+        login_user(user)
+        return redirect('/')
+    return render_template('register.html', form=form)
+
+
 
 
 @login_required
@@ -225,6 +250,64 @@ def create_product(shop_id):
     return render_template('product_creating.html', form=form)
 
 
+@login_required
+@app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    db_sess = db_session.create_session()
+    product = db_sess.query(Product).get(product_id)
+    if not product:
+        abort(404)
+    shop = db_sess.query(Shop).get(product.shop_id)
+    if not shop or shop.user != current_user:
+        abort(403)
+    form = ProductForm()
+    if request.method == 'GET':
+        # Заполнение формы текущими данными товара
+        form.name.data = product.name
+        form.description.data = product.description
+        form.price.data = product.price
+        form.stock_quantity.data = product.stock_quantity
+        form.category.data = product.category
+    if form.validate_on_submit():
+        # Обновление данных товара
+        product.name = form.name.data
+        product.description = form.description.data
+        product.price = form.price.data
+        product.stock_quantity = form.stock_quantity.data
+        product.category = form.category.data
+        f = form.logo.data
+        if f:
+            if product.logo_url and os.path.exists(f'./static/photo/{product.logo_url}'):
+                os.remove(f'./static/photo/{product.logo_url}')
+            filename = secure_filename(f.filename)
+            if filename in os.listdir('static/photo'):
+                flash("Файл с таким именем уже существует. Переименуйте загружаемый файл", "warning")
+                return render_template('product_edit.html', form=form, product=product)
+            f.save(os.path.join('static', 'photo', filename))
+            product.logo_url = filename
+        db_sess.commit()
+        product_edit_test(product)
+        return redirect(f'/product/{product_id}')
+    return render_template('product_creating.html', form=form, product=product)
+
+
+@login_required
+@app.route('/delete_product/<int:product_id>')
+def delete_product(product_id):
+    db_sess = db_session.create_session()
+    product = db_sess.query(Product).get(product_id)
+    if product:
+        if product.shop.user != current_user:
+            abort(403)
+        product_delete_test(product.id)
+        os.remove(f'./static/photo/{product.logo_url}')
+        db_sess.delete(product)
+        db_sess.commit()
+        db_sess.close()
+        return redirect('/catalog')
+    abort(404)
+
+
 @app.route('/product/<int:product_id>')
 def product(product_id):
     db_sess = db_session.create_session()
@@ -260,6 +343,8 @@ def add_to_cart(product_id):
 @app.route('/cart')
 def cart():
     db_sess = db_session.create_session()
+    if not current_user.is_authenticated:
+        abort(403)
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
     if not cart:
         cart = Shopping_cart(user_id=current_user.id,
@@ -278,7 +363,6 @@ def cart():
 @app.route('/cart/remove', methods=['GET', 'POST'])
 def remove_from_cart():
     product_id = request.form.get('product_id')
-    print(product_id)
     db_sess = db_session.create_session()
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
     for js in cart.data:
@@ -305,6 +389,7 @@ def update_cart():
             elem['quantity'] = quantity
     flag_modified(cart, "data")
     db_sess.commit()
+    db_sess.close()
     return redirect('/cart')
 
 
@@ -342,6 +427,7 @@ def checkout():
                 return redirect('/cart')
     db_sess.delete(cart)
     db_sess.commit()
+    db_sess.close()
     flash(
         "Ваш заказ успешно оформлен. Ожидайте, пока с вами свяжутся представители магазина. Если этого не произойдет, "
         "проверьте данные для связи в профиле и повторите заказ.", "success")
@@ -350,6 +436,10 @@ def checkout():
 
 def main():
     db_session.global_init('db/market.db')
+    api.add_resource(ProductsResource, '/api/products/<int:product_id>')
+    api.add_resource(ProductsListResource, '/api/products')
+    api.add_resource(ShopsResource, '/api/shops/<int:shop_id>')
+    api.add_resource(ShopsListResource, '/api/shops')
     app.run(host='127.0.0.1', port=8080)
 
 
