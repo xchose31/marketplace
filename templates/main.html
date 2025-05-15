@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block main %}
+
+<div class="product-grid">
+        {% if products %}
+        {% for product in products %}
+        <div class="card product-card">
+            <div class="card-left">
+                <h5 class="card-title"><a href="/product/{{ product.id }}">{{ product.name }}</a></h5>
+                <p class="card-text">{{ product.description }}</p>
+                <div class="card-buttons">
+                    <a href="/add_to_cart/{{ product.id }}" class="btn btn-primary btn-sm cart-btn">
+                        <i class="bi bi-cart-plus"></i> В корзину
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="card-right">
+                <img src="{{ url_for('static', filename='photo/' + product.logo_url) }}" class="card-img-top"
+                     alt="Лого товара">
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+</div>
+
+{% endblock %}

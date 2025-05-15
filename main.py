@@ -12,7 +12,6 @@ from forms.RegisterForm import RegisterForm
 from forms.Login_user_form import Login_user_form
 from forms.Shop_registration_form import Shop_registration
 from forms.product_creating_form import ProductForm
-from forms.UserEditForm import UserEditForm
 from data.models.users import User
 from data.models.shops import Shop
 from data.models.products import Product
@@ -36,10 +35,10 @@ def main_menu():
     db_sess = db_session.create_session()
     product_ids = db_sess.query(Product.id).all()
     product_ids = [id[0] for id in product_ids]
-    if len(product_ids) > 6:
-        product_ids = random.sample(product_ids, 6)
+    if len(product_ids) > 3:
+        product_ids = random.sample(product_ids, 3)
     products = [db_sess.query(Product).get(id) for id in product_ids]
-    return render_template('base.html', products=products)
+    return render_template('main.html', products=products)
 
 
 @app.route('/catalog')
