@@ -225,6 +225,56 @@ def create_product(shop_id):
     return render_template('product_creating.html', form=form)
 
 
+@login_required
+@app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    db_sess = db_session.create_session()
+    product = db_sess.query(Product).get(product_id)
+
+    if not product:
+        abort(404)  # Товар не найден
+
+    shop = db_sess.query(Shop).get(product.shop_id)
+    if not shop or shop.user != current_user:
+        abort(403)  # Доступ запрещен
+
+    form = ProductForm()
+    if request.method == 'GET':
+        # Заполнение формы текущими данными товара
+        form.name.data = product.name
+        form.description.data = product.description
+        form.price.data = product.price
+        form.stock_quantity.data = product.stock_quantity
+        form.category.data = product.category
+
+    if form.validate_on_submit():
+        # Обновление данных товара
+        product.name = form.name.data
+        product.description = form.description.data
+        product.price = form.price.data
+        product.stock_quantity = form.stock_quantity.data
+        product.category = form.category.data
+
+        # Проверка, загрузил ли пользователь новый файл логотипа
+        f = form.logo.data
+        if f:
+            # Удаляем старый логотип
+            if product.logo_url and os.path.exists(f'./static/photo/{product.logo_url}'):
+                os.remove(f'./static/photo/{product.logo_url}')
+
+            # Сохраняем новый логотип
+            filename = secure_filename(f.filename)
+            if filename in os.listdir('static/photo'):
+                flash("Файл с таким именем уже существует. Переименуйте загружаемый файл", "warning")
+                return render_template('product_edit.html', form=form, product=product)
+            f.save(os.path.join('static', 'photo', filename))
+            product.logo_url = filename
+        db_sess.commit()
+        return redirect(f'/product/{product_id}')  # Перенаправление на страницу товара
+
+    return render_template('product_creating.html', form=form, product=product)
+
+
 @app.route('/product/<int:product_id>')
 def product(product_id):
     db_sess = db_session.create_session()
