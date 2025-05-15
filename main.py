@@ -1,8 +1,7 @@
 import os
 import random
-from ast import iter_child_nodes
-
-from flask import Flask, render_template, redirect, request, abort, jsonify
+from data.mail_sender import send_email
+from flask import Flask, render_template, redirect, request, abort, jsonify, flash
 from flask_restful import Api
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.utils import secure_filename
@@ -35,6 +34,7 @@ def main_menu():
         product_ids = random.sample(product_ids, 6)
     products = [db_sess.query(Product).get(id) for id in product_ids]
     return render_template('base.html', products=products)
+
 
 @app.route('/catalog')
 def catalog():
@@ -234,6 +234,7 @@ def product(product_id):
         return render_template('product.html', product=product)
     abort(404)
 
+
 @login_required
 @app.route('/add_to_cart/<int:product_id>')
 def add_to_cart(product_id):
@@ -255,18 +256,24 @@ def add_to_cart(product_id):
     db_sess.commit()
     return redirect('/cart')
 
+
 @login_required
 @app.route('/cart')
 def cart():
     db_sess = db_session.create_session()
     cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    if not cart:
+        cart = Shopping_cart(user_id=current_user.id,
+                             data=[])
     final_sum = 0
+
     for js in cart.data:
         product = db_sess.query(Product).get(js['product_id'])
         js['name'] = product.name
         js['logo_url'] = f'/static/photo/{product.logo_url}'
         final_sum += js['price'] * js['quantity']
     return render_template('cart.html', products=cart.data, final_sum=final_sum)
+
 
 @login_required
 @app.route('/cart/remove', methods=['GET', 'POST'])
@@ -282,6 +289,7 @@ def remove_from_cart():
     db_sess.commit()
     return redirect('/cart')
 
+
 @login_required
 @app.route('/cart/update', methods=['GET', 'POST'])
 def update_cart():
@@ -296,6 +304,40 @@ def update_cart():
     print(cart.data)
     flag_modified(cart, "data")
     db_sess.commit()
+    return redirect('/cart')
+
+
+@login_required
+@app.route('/checkout')
+def checkout():
+    db_sess = db_session.create_session()
+    cart = db_sess.query(Shopping_cart).filter(Shopping_cart.user_id == current_user.id).first()
+    users = {}
+    if cart:
+        for js in cart.data:
+            product = db_sess.query(Product).get(js['product_id'])
+            shop = db_sess.query(Shop).get(product.shop_id)
+            user = shop.user
+            email = user.email
+            if email not in users:
+                users[email] = [
+                    {'name': product.name, 'id': product.id, 'quantity': js['quantity'], 'price': js['price']}]
+            else:
+                users[email].append(
+                    {'name': product.name, 'id': product.id, 'quantity': js['quantity'], 'price': js['price']})
+        for email in users:
+            if send_email(email, "Пришел заказ", users[email], current_user):
+                print("Email was sent")
+            else:
+                print("Email was not sent")
+                flash(
+                    "Произошла внутренняя ошибка, заказ не был оформлен. Обратитесь в техническую поддержку.",
+                    "danger")
+                return redirect('/cart')
+    db_sess.delete(cart)
+    db_sess.commit()
+    flash(
+        "Ваш заказ успешно оформлен. Ожидайте, пока с вами свяжутся представители магазина. Если этого не произойдет, проверьте данные для связи в профиле и повторите заказ.", "success")
     return redirect('/cart')
 
 
