@@ -24,5 +24,211 @@
             {% endif %}
         </div>
 </div>
+<style>
+    .shop-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+
+    .shop-detail-card {
+        display: flex;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 35px;
+        background-color: #ffffff;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        gap: 40px;
+        margin-bottom: 20px;
+    }
+
+    .shop-media {
+        flex: 0 0 auto;
+    }
+
+    .shop-logo {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        position: sticky;
+        top: 35px;
+    }
+
+    .shop-logo-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    .shop-info {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .shop-name {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 2em;
+    }
+
+    .shop-description {
+        margin: 0 0 20px 0;
+        color: #666;
+        font-size: 1.2em;
+        line-height: 1.5;
+    }
+
+    .shop-meta {
+        margin-top: 20px;
+        text-align: right;
+    }
+
+    .creation-date {
+        color: #888;
+        font-size: 1em;
+        font-style: italic;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .product-card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-right {
+        height: 180px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .card-right img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .card-right img {
+        transform: scale(1.05);
+    }
+
+    .card-left {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        margin: 0 0 10px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .card-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .card-title a:hover {
+        color: #0066cc;
+    }
+
+    .card-text {
+        margin: 0 0 15px 0;
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        flex-grow: 1;
+    }
+
+    .card-buttons {
+    display: flex;
+    gap: 10px; /* Расстояние между кнопками */
+    flex-wrap: wrap; /* Перенос кнопок, если не хватает места */
+    }
+
+    .card-buttons .btn {
+    flex: 0 1 auto; /* Кнопки остаются гибкими, но не растягиваются */
+    }
+
+
+    .cart-btn {
+        align-self: flex-start;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .cart-btn:hover {
+        background-color: #0052a3;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .shop-detail-card {
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .shop-logo {
+            position: static;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+
+        .product-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+    }
+
+    @media (max-width: 480px) {
+        .shop-detail-container {
+            padding: 15px;
+        }
+
+        .shop-detail-card {
+            padding: 20px;
+        }
+
+        .product-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
 {% endblock %}

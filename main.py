@@ -29,23 +29,14 @@ login_manager.init_app(app)
 api = Api(app)
 app.config['SECRET_KEY'] = 'MARKETPLACE_SECRET_KEY'
 
-
-@app.route('/')
-def main_menu():
-    db_sess = db_session.create_session()
-    product_ids = db_sess.query(Product.id).all()
-    product_ids = [id[0] for id in product_ids]
-    if len(product_ids) > 3:
-        product_ids = random.sample(product_ids, 3)
-    products = [db_sess.query(Product).get(id) for id in product_ids]
-    return render_template('main.html', products=products)
-
-
 @app.route('/catalog')
+@app.route('/')
 def catalog():
     db_sess = db_session.create_session()
     products = db_sess.query(Product).all()
     return render_template('catalog.html', products=products)
+
+
 
 
 @login_manager.user_loader
